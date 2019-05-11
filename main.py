@@ -4,7 +4,7 @@ Created on Fri Apr 12 11:50:44 2019
 
 @author: saket
 """
-
+#loading csv files
 import pandas as pd
 a=pd.read_csv('dataset_v21.csv')
 b=pd.read_csv('dataset_v22.csv')
@@ -16,6 +16,7 @@ g=pd.read_csv('dataset_v27.csv')
 h=pd.read_csv('dataset_v28.csv')
 l=pd.read_csv('dataset_v29.csv')
 m=pd.read_csv('dataset_v30.csv')
+
 
 x1=a.iloc[:,1].values
 x2=b.iloc[:,1].values
@@ -141,29 +142,28 @@ for i in range(len(x5)-1):
     Y[i+j]=y5[i]
 '''
 
+#splitting into train and test data
 from sklearn.model_selection import train_test_split
 X_train, X_test, Y_train, Y_test = train_test_split(X,Y, test_size = 0.1, random_state=42)
 
+#normalizing the pixel values
 X_train = X_train / 255.0
 X_test = X_test/255.0
 
-
+#adding an extra dimension for giving as input to the model
 X_train = X_train[:,:,:,np.newaxis]
 X_test = X_test[:,:,:,np.newaxis]
 
+# rounding off PWM values to 2 decimal points
 for i in range(len(Y_train)):
     Y_train[i] = round(Y_train[i][0],2)
     
 for i in range(len(Y_test)):
     Y_test[i] = round(Y_test[i][0],2)
     
-
-'''
-from sklearn.preprocessing import StandardScaler
-sc =StandardScaler()
-Y_train = sc.fit_transform(Y_train)
-Y_test = sc.transform(Y_test)
-'''
+#finding min and max values
+#subtracting max values 
+#and normalizing
 ymin = np.min(Y_train)
 Y_train = Y_train - ymin
 Y_test = Y_test - ymin
@@ -173,7 +173,7 @@ ymax = np.max(Y_test)
 Y_train=Y_train/ymax
 Y_test = Y_test/ymax
 
-
+#defining model
 import tensorflow as tf
 model1 = tf.keras.models.Sequential([
   tf.keras.layers.Conv2D(36,3,3,input_shape=(310,480,1),activation=tf.nn.elu),
@@ -189,58 +189,32 @@ model1 = tf.keras.models.Sequential([
   tf.keras.layers.Dense(1, kernel_initializer = 'uniform', activation=tf.nn.elu) 
 ])
     
-model1 = tf.keras.models.Sequential([
-  #tf.keras.layers.Conv2D(32,(3,3),activation=tf.nn.relu),
-  #tf.keras.layers.Dropout(0.25),
-  #tf.keras.layers.Conv2D(64,(3,3),activation=tf.nn.relu),
-  #tf.keras.layers.Conv2D(64,(5,5),activation=tf.nn.relu),
-  #tf.keras.layers.MaxPooling2D(pool_size=(2, 2)),
-  #tf.keras.layers.Dropout(0.25),
-  #tf.keras.layers.Flatten(),
-  tf.keras.layers.Dense(128, kernel_initializer = 'uniform', activation=tf.nn.relu, input_dim = 51200),
-  tf.keras.layers.Dropout(0.25),
-  tf.keras.layers.Dense(256, kernel_initializer = 'uniform', activation=tf.nn.relu),
-  tf.keras.layers.Dropout(0.25),
-  tf.keras.layers.Dense(512, kernel_initializer = 'uniform', activation=tf.nn.relu),
-  tf.keras.layers.Dropout(0.25),
-  tf.keras.layers.Dense(1, kernel_initializer = 'uniform', activation=tf.nn.relu)
-])
-
+#generates model summary
 model1.summary()    
-    
+
+#initialize model with ADAM optimizer and mean square error loss match
 model1.compile(optimizer= 'adam', loss='mse', metrics = ['accuracy'])
 
+#training the model with train and test data
 m = model1.fit(X_train, Y_train, epochs=40, batch_size = 16, validation_data = (X_test, Y_test), shuffle=True)
 
+#saving model 
 model1.save_weights('mod_3.h5')
 
-model1.load_weights('model2.h5')
-keras_file = "lane_model1.h5"
-tf.keras.models.save_model(model1, keras_file)
-
-converter = tf.lite.TFLiteConverter.from_keras_model_file("lane_model1.h5")
-tflite_model = converter.convert()
-open("converted_lane1.tflite", "wb").write(tflite_model)
-
-
-
-import tensorflow as tf
-model1 = tf.keras.models.Sequential([
-  tf.keras.layers.Conv2D(36,3,3,input_shape=(310,480,1),activation=tf.nn.elu),
-  tf.keras.layers.MaxPooling2D(pool_size=(2, 2)),
-  tf.keras.layers.Conv2D(48,3,3,activation=tf.nn.elu),
-  tf.keras.layers.MaxPooling2D(pool_size=(2, 2)),
-  tf.keras.layers.Conv2D(64,3,3,activation=tf.nn.elu),
-  tf.keras.layers.Dropout(0.25),
-  tf.keras.layers.Flatten(),
-  tf.keras.layers.Dense(100, kernel_initializer = 'uniform', activation=tf.nn.elu),
-  tf.keras.layers.Dense(50, kernel_initializer = 'uniform', activation=tf.nn.elu),
-  tf.keras.layers.Dense(10, kernel_initializer = 'uniform', activation=tf.nn.elu),
-  tf.keras.layers.Dense(1, kernel_initializer = 'uniform', activation=tf.nn.elu) 
-])
-    
+#load the model instead of training everytime
 model1.load_weights('mod_3.h5')
 
+#plotting train loss and test loss vs epochs
+import matplotlib.pyplot as plt
+plt.plot(m.history['loss'])
+plt.plot(m.history['val_loss'])
+plt.title('model loss')
+plt.ylabel('loss')
+plt.xlabel('epoch')
+plt.legend(['train', 'test'], loc='upper left')
+plt.show()
+
+#testing the trained model on an image
 ymax = 3.21
 ymin = 9.29
 
@@ -256,24 +230,3 @@ img= cv2.imread(x3[ind],0)
 image = img[50:,:]
 plt.imshow(image)
 print(ans)
-
-interpreter = tf.lite.Interpreter(model_path="converted_lane1.tflite")
-interpreter.allocate_tensors()
-
-input_details = interpreter.get_input_details()
-output_details = interpreter.get_output_details()
-
-interpreter.set_tensor(input_details[0]['index'], image)
-
-interpreter.invoke()
-output_data = interpreter.get_tensor(output_details[0]['index'])
-print(output_data)
-
-import matplotlib.pyplot as plt
-plt.plot(m.history['loss'])
-plt.plot(m.history['val_loss'])
-plt.title('model loss')
-plt.ylabel('loss')
-plt.xlabel('epoch')
-plt.legend(['train', 'test'], loc='upper left')
-plt.show()

@@ -41,4 +41,3 @@ Download link : https://www.python.org/downloads/release/python-365/
     ,else <code> pip install tensorflow==1.13.1</code>
   </li>
   <li> spyder(IDE) : <code>pip install spyder</li>
-</ul></ol>

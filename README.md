@@ -7,4 +7,8 @@ DC motors<br/>
 Python 3.6.5<br/>
 TensorFlow 1.13.1<br/>
 
+TensorFlow 1.13.1 supports upto Python 3.7.<br/>
+To let TensorFlow use your Nvidia GPU, install<br/>
+<li> CUDA Toolkit 10 </li>
+<li> CUDnn </li>
 

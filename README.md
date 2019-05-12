@@ -11,7 +11,6 @@ TensorFlow 1.13.1<br/>
 Not using conda<br/>
 
 TensorFlow 1.13.1 supports upto Python 3.7.<br/>
-To let TensorFlow use your Nvidia GPU, install<br/>
 <ol>
 <li> CUDA Toolkit 10.0 (latest version)</li>
 Download link : https://developer.nvidia.com/cuda-10.0-download-archive?target_os=Windows&target_arch=x86_64 <br/>
@@ -38,9 +37,10 @@ Download link : https://www.python.org/downloads/release/python-365/
   <li>openCV : <code>pip install opencv-python</code></li>
   <li>imutils : <code>pip install imutils</code></li>
   <li>matplotlib : <code>pip install matplotlib</code></li>
-  <li>tensorflow : <code> pip install tensorflow-gpu==1.13.1</code>, if you have a GPU<br/>
-    <code> pip install tensorflow==1.13.1</code>
+  <li>tensorflow : If you have a Nvidia GPU, <code> pip install tensorflow-gpu==1.13.1</code><br/>
+    ,else <code> pip install tensorflow==1.13.1</code>
   </li>
+  <li> spyder(IDE) : <code>pip install spyder</li>
 </ul>
 </ol>
 

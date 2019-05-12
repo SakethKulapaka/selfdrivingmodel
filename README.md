@@ -10,5 +10,6 @@ TensorFlow 1.13.1<br/>
 TensorFlow 1.13.1 supports upto Python 3.7.<br/>
 To let TensorFlow use your Nvidia GPU, install<br/>
 <li> CUDA Toolkit 10 </li>
+Download link : https://developer.nvidia.com/cuda-10.0-download-archive?target_os=Windows&target_arch=x86_64 <br/>
 <li> CUDnn </li>
 

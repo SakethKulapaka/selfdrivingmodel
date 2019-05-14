@@ -41,4 +41,5 @@ Download link : https://www.python.org/downloads/release/python-365/
     ,else <code> pip install tensorflow==1.13.1</code>
   </li>
   <li> spyder(IDE) : <code>pip install spyder</li>
- Note : Installation of CUDA and cuDNN is required only when you have an NVIDIA GPU, if not you can skip the installation
+    
+Note : Installation of CUDA and cuDNN is required only when you have an NVIDIA GPU, if not you can skip the installation
